@@ -1,6 +1,10 @@
+
+//estas variables globales sirven para conectar con arbol-draw
 var nodes, edges;
 
-d3.csv('family.csv',function(data){
+//limpia los datos y luego llama a arbol-draw
+var clearUpArbol = function(data){
+  function(data){
 
 
   //creo los nodos de todos 
@@ -10,7 +14,7 @@ d3.csv('family.csv',function(data){
     "name":f.name,
     "profession": "housewife",
     "sex":'f',
-    "image": "marge.png",
+    "image": "person.png",
     "relationBase": f};  
   });
   
@@ -21,15 +25,15 @@ d3.csv('family.csv',function(data){
     var membersDown = [];
     var id = familyLink.length + 1;
     membersDown.push(r.name);
-    return {"type":'family',"id":'f'+id,"name":'', "image":"","direction":'down', 
+    return {children:[], parent:[],"type":'family',"id":'f'+id,"name":'', "image":"","direction":'down', 
             'createdFor': r.name, members: {down:membersDown,up:[],same:[]}};
   };
 
 var createFamilyForSame = function(r){
     var membersUp = [];
     var id = familyLink.length + 1;
-    membersUp.push(r.name);
-    return {"type":'family',"id":'f'+id,"name":'', "image":"","direction":'down', 
+    membersUp.push(r.name);    
+    return {children:[], parent:[],"type":'family',"id":'f'+id,"name":'', "image":"","direction":'same', 
             'createdFor': r.name, members: {down:[],up:membersUp,same:membersUp}};
   };
 
@@ -74,6 +78,8 @@ var createFamilyForSame = function(r){
     for (var i = 0; i < familyMembers.length; i++) {
       if (familyMembers[i].name == r){
         m = familyMembers[i];
+        if (!m.children) { m.children = [];}
+        if (!m.parent) { m.parent = [];}
         break;
 
       }
@@ -83,6 +89,8 @@ var createFamilyForSame = function(r){
 
   var getSourceAndTarget = function(r,i){
 
+      r.children=[];
+      r.parent=[];
       //Si no tiene relaciones, solo lo creo a el y a su familia
       var relation ;
       //Tiene
@@ -92,7 +100,10 @@ var createFamilyForSame = function(r){
         familyLink.push(f);
         //siempre lo creo como hijo.
         relation = {id:1,source:f.id,target:r.id,type:'children'};
-        
+
+        f.children.push(r);
+        r.parent.push(f);
+
       }
       else {
         //tiene relacion con una persona :-o;
@@ -114,6 +125,12 @@ var createFamilyForSame = function(r){
             newFamiliy.members.up.push(elPadre.name);
             newFamiliy.members.same.push(elPadre.name);
             
+
+            elPadre.children.push(newFamiliy);
+            newFamiliy.parent.push(elPadre);
+            elHijo.parent.push(newFamiliy);
+            newFamiliy.children.push(elPadre);
+
             var z = relations.length +1;
             
             //Ahora agrego al down, como hijo
@@ -127,6 +144,8 @@ var createFamilyForSame = function(r){
           else {
             f.members.up.push(r.name);
             f.members.same.push(r.name);
+            r.children.push(f);
+            f.parent.push(r);
             var z = relations.length +1;
             relation = {id:z,source:f.id,target:r.id,type:'married'};
           }
@@ -151,8 +170,16 @@ var createFamilyForSame = function(r){
             newFamiliy.members.up.push(laPareja.name);
             newFamiliy.members.same.push(laPareja.name);
             
+            laPareja.children.push(newFamiliy);
+            newFamiliy.parent.push(laPareja);
+            laEmparejada.children.push(newFamiliy);
+            newFamiliy.parent.push(laEmparejada);
+
+
             var z = relations.length +1;
             
+
+
             //Ahora agrego al down, como hijo
             relationPareja = {id:z,source:newFamiliy.id,target:laPareja.id,type:'married'};
             //Ahora agrego al up, como como casado
@@ -162,8 +189,11 @@ var createFamilyForSame = function(r){
 
           }
           else {
-            f.members.same.push(r.name);
+            
             f.members.up.push(r.name);
+            f.members.same.push(r.name);
+            r.children.push(f);
+            f.parent.push(r);
             var z = relations.length +1;
             relation = {id:z,source:f.id,target:r.id,type:'married'};
           }
@@ -197,6 +227,9 @@ var createFamilyForSame = function(r){
           }
           else {
             f.members.down.push(r.name);
+            r.parent.push(f);
+            f.children.push(r);
+
             var z = relations.length +1;
             relation = {id:z,source:f.id,target:r.id,type:'child'};
           }
@@ -232,6 +265,8 @@ var createFamilyForSame = function(r){
           }
           else {
             f.members.down.push(r.name);
+            r.parent.push(f);
+            f.children.push(r);
             var z = relations.length +1;
             relation = {id:z,source:f.id,target:r.id,type:'child'};
           }
@@ -260,88 +295,51 @@ var createFamilyForSame = function(r){
 
   nodes = familyMembers;
   edges = relations;
-  console.log(edges);
+
+ 
+  var familyNodes = [];
+
+
+  //el nivel de cada nodo es la suma  de hasta donde llegan su hijos
+
+
+
+  var sumLevel = function(fm){
+
+    var level =0;
+    if (fm.id.indexOf('f')>-1){
+      level =1;
+    }
+
+    fm.parent.map(function(p){
+
+      level += sumLevel(p);
+    });
+    return level;
+  }
+
+  familyMembers.map(function(fm){
+    if (fm.id.indexOf('f')>-1){
+      var c = sumLevel(fm);
+      fm.level = c;  
+    }
+    
+  })
+
+
+  //aca llamo a Arbol-Draw :-o
   initTree();
-  //each person needs a node
-//AND each family needs a node
 
-//First Member.
-//Add member and family root.
 
-});
+}
+//ejemplo de input de dataset, el callback deberia ser cualquier fuente de datos
+d3.csv('family.csv',clearUpArbol);
 
 
 
 
-// var nodes = [
-
-//   //Homer and Marge's Family
-//   {"type":'family',"id":'f1',"name":'', "image":""},// Ahmad
-//   {"type":'person',"id":'p1',"name":'Marge Simpson',"age": 39, "profession": "housewife","sex":'f',"image": "marge.png"},
-//   // {"type":'person',"id":'p2',"name":'Homer Simpson',"age": 36, "profession": "safety inspector","sex":'m',"image": "homer.png"},
-//   {"type":'person',"id":'p3',"name":'Bart Simpson',"age": 10 ,"sex":'m',"image": "bart.png"},
-//   // {"type":'person',"id":'p4',"name":'Lisa Simpson',"age": 8 ,"sex":'f',"image": "lisa.png"},
-//   // {"type":'person',"id":'p5',"name":'Maggie Simpson',"age": 1,"sex":'f',"image": "maggie.png"},
-//   // {"type":'person',"id":'p6',"name":"Santa's Little Helper","age": 2,"sex":'m',"image": "santa.png"},
 
 
-//   //Homer and Marge's Family
-//   {"type":'family',"id":'f4',"name":'', "image":""},// Ahmad
-//   {"type":'person',"id":'p33',"name":'Barta Simpsona',"age": 112 ,"sex":'z',"image": "barta.png"},
-//   // //Abraham and Mona's Family
-//   // {"type":'family',"id":'f3',"name":'', "image":""},// Nasr
-//   // {"type":'person',"id":'p8',"name":'Abraham Simpson',"age": 83, "profession": "retired farmer","sex":'m',"image": "grampa.png"},
-//   // {"type":'person',"id":'p9',"name":'Mona Simpson',"age": 81, "profession": "activist","sex":'f',"image": "mona.png"},
-//   // {"type":'person',"id":'p7',"name":'Herb Simpson',"age": 44, "profession": "car salesman","sex":'m',"image": "herb.png"},
-
-//   // //Clancy and Jacqueline's Family
-//   // {"type":'family',"id":'f4',"name":'', "image":""},// Nasr
-//   // {"type":'person',"id":'p10',"name":'Clancy Bouvier',"age": 75, "profession": "air steward","sex":'m',"image": "dad.png"},
-//   // {"type":'person',"id":'p11',"name":'Jacqueline Bouvier',"age": 71, "profession": "housewife","sex":'f',"image": "mum.png"},
-//   // {"type":'person',"id":'p13',"name":'Patty Bouvier',"age": 41, "profession": "receptionist","sex":'f',"image": "selma.png"},
-
-//   // //Selma's Family
-//   // {"type":'family',"id":'f5',"name":'', "image":""},
-//   // {"type":'person',"id":'p12',"name":'Selma Bouvier',"age": 41, "profession": "secretary","sex":'f',"image": "patty.png"},
-//   // {"type":'person',"id":'p14',"name":'Ling Bouvier',"age": 3,"sex":'f',"image": "ling.png"}
 
 
-// ]
-
-// //currently there are four types of links
-// //family - family id is always the source
-// //married - link between two person ids
-// //adopted and divorced - behave like family but
-// //dotted line for divorced, gold line for adopted
-
-// var edges = [
-//   // //FAMILY 1 - Ahmad Asfoor ..!
-//   {id:1,source:'f1',target:'p1',type:'married'},
-//   // {id:2,source:'f1',target:'p2',type:'married'},
-//   {id:3,source:'f1',target:'p3',type:'child'},
-//   // {id:4,source:'f1',target:'p4',type:'child'},
-//   // {id:5,source:'f1',target:'p5',type:'child'},
-//   // {id:6,source:'f1',target:'p6',type:'child'},
-
-//   // //FAMILY 1 - Ahmad Asfoor ..!
-//   {id:200,source:'f4',target:'p33',type:'married'},
-//   {id:200,source:'f4',target:'p3',type:'married'},
-//   // {id:2,source:'f1',target:'p2',type:'married'},
-//   // //FAMILY 2 - Nasr Asfoor...
-//   // {id:8,source:'f3',target:'p8',type:'married'},
-//   // {id:9,source:'f3',target:'p9',type:'married'},
-//   // {id:10,source:'f3',target:'p2',type:'child'},
-//   // {id:11,source:'f3',target:'p7',type:'child'},
-
-//   // //FAMILY 3 - BOUVIERS
-//   // {id:8,source:'f4',target:'p10',type:'married'},
-//   // {id:9,source:'f4',target:'p11',type:'married'},
-//   // {id:10,source:'f4',target:'p1',type:'child'},
-//   // {id:10,source:'f4',target:'p12',type:'child'},
-//   // {id:10,source:'f4',target:'p13',type:'child'},
-
-//   // {id:8,source:'f5',target:'p12',type:'married'},
-//   // {id:10,source:'f5',target:'p14',type:'child'}
-
-// ]
 
