@@ -1,10 +1,9 @@
-
 //estas variables globales sirven para conectar con arbol-draw
 var nodes, edges;
 
 //limpia los datos y luego llama a arbol-draw
 var clearUpArbol = function(data){
-  function(data){
+  
 
 
   //creo los nodos de todos 
@@ -14,7 +13,7 @@ var clearUpArbol = function(data){
     "name":f.name,
     "profession": "housewife",
     "sex":'f',
-    "image": "person.png",
+    "image": "person.jpg",
     "relationBase": f};  
   });
   

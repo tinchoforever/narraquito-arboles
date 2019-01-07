@@ -33,8 +33,8 @@ function familyChart() {
     //set the repel force - may need to be tweaked for multiple data
     //the lower the strength the more they will repel away from each other
     //the larger the distance, the more apart they will be
-    var repelForce = d3.forceManyBody().strength(-3000).distanceMax(450)
-                       .distanceMin(40);
+     var repelForce = d3.forceManyBody().strength(-3000).distanceMax(450)
+                       .distanceMin(85);
 
     //start the simulation
     //alpha decay - if less, force takes longer but is better positioned
@@ -43,25 +43,19 @@ function familyChart() {
     //link distance - repel takes precidence - try upping or lowering the strength and changing the distances
     //collide - this is on maximum strength and is higher for family (bigger radius) than others so should keep
     //families further apart than people
-
-    var simulation = 
-    d3.forceSimulation()
-                      .alphaDecay(0.04)
-                      .alphaTarget(0)
-                      .velocityDecay(0.9)
-                       .force("charge_force", d3.forceManyBody())
-                       .force("center_force", d3.forceCenter(width / 2, height / 2))
-                        .force("center", d3.forceCenter(width / 2, height / 2))
-                       .force("xAxis",d3.forceX())
-                       .force("yAxis",d3.forceY())
+    var simulation = d3.forceSimulation()
+                  //     .alphaDecay(0.04)
+                  //     .velocityDecay(0.4)
+                  //     .force("center", d3.forceCenter(width / 2, height / 2))
+                       .force("xAxis",d3.forceX(width/2).strength(0.4))
+                       .force("yAxis",d3.forceY(height/2).strength(0.6))
                        .force("repelForce",repelForce)
                        .force("link", d3.forceLink().id(function(d) { return d.id }).distance(dist).strength(1.5))
                        .force("collide",d3.forceCollide().radius(function(d) { return d.r * 20; }).iterations(10).strength(1))
-                       // .stop();
 
     function dist(d){
       //used by link force
-      return 120
+      return 100
 
     }
     simulation.alphaTarget(0).restart();
