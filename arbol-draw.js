@@ -16,7 +16,6 @@ var width = window.innerWidth, // default width
 var svg = d3.select('#forces').append("svg")
             .attr("width", width)
             .attr("height", height)
-            .attr("background-color","yellow")
             .call(myChart);
 
 function familyChart() {
@@ -33,7 +32,7 @@ function familyChart() {
     //set the repel force - may need to be tweaked for multiple data
     //the lower the strength the more they will repel away from each other
     //the larger the distance, the more apart they will be
-     var repelForce = d3.forceManyBody().strength(-3000).distanceMax(450)
+     var repelForce = d3.forceManyBody().strength(-5000).distanceMax(450)
                        .distanceMin(85);
 
     //start the simulation
@@ -81,13 +80,13 @@ function familyChart() {
         })
       .attr("stroke", function(d){  //grey unless adopted (blue) or married/divorced (gold) or married_invisible (white)
         if(d.type == 'married' || d.type=="divorced"){
-          return "gold"
+          return "#2DB674"
         } else if(d.type=='adopted'){
-          return "blue"
+          return "#2DB674"
         } else if(d.type=='married_invisible'){
-          return "white"
+          return "#2DB674"
         } else {
-          return "grey"
+          return "#2DB674"
         }
       });
 
@@ -126,7 +125,7 @@ function familyChart() {
         node.append('path')
             .attr('class',"semi-circle")
             .attr('fill','none')
-            .attr('stroke','grey')
+            .attr('stroke','#2DB674')
             .attr('stroke-width', function(d){
               if(d.dead == undefined){return "0px"
               }else{return "4px"}})
@@ -140,13 +139,13 @@ function familyChart() {
                             return family_radius;
                           } else{return 40;}})
                        .attr("fill",function(d,i){ //white if family, otherwise image
-                         if(d.type == "family"){return "white"}
+                         if(d.type == "family"){return "#4570B6"}
                          else{return "url(#my_image" + i + ")"}})
                         .attr("stroke", function(d){
                           //different borders for family, male and female
-                          if (d.type == "family"){return "gold";
-                          } else { if(d.sex == "m"){return "blue"
-                          } else {  return "pink"}}})
+                          if (d.type == "family"){return "#4570B6";
+                          } else { if(d.sex == "m"){return "#4570B6"
+                          } else {  return "#C73D62"}}})
                           .attr("stroke-width","2px")
                           .on("mouseover", function(d){
                             if(d.type !== "family"){
