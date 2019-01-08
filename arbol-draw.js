@@ -127,7 +127,7 @@ function familyChart() {
         .attr("xlink:href", function(d) {return d.image})
         .attr("height", height_draw)
         .attr("width", width_draw)
-        .attr("x", 2)
+        .attr("x", 1)
         .attr("y", 0);
 
         //append deceased arc - only visible if "dead" is defined
@@ -153,6 +153,8 @@ function familyChart() {
 
     var circles = node.filter(function(d) { return d.type != "family"; }).append("rect")
                       .attr("class","circle")
+                      .attr('x',-40)
+                      .attr('y',-40)
                       .attr("width", function(d){ //radius - bigger if family
                           if (d.type == "family"){
                             return family_radius;
@@ -196,8 +198,8 @@ function familyChart() {
     //append labels
     var texts = node.append("text")
         .style("fill", "black")
-        .attr("dx", 32)
-        .attr("dy", 92)
+        .attr("dx", -8)
+        .attr("dy", 50)
         .attr("text-anchor","middle")
         .text(function(d) {
             return titleCase(d.name);
