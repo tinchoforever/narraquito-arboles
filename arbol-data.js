@@ -9,6 +9,7 @@ var clearUpArbol = function(data){
   //creo los nodos de todos 
   var familyMembers = data.map(function(f,i){
     return {
+    "mainId": f.id,  
     "type":'person',"id":'p'+i,
     "name":f.name,
     "profession": "housewife",
@@ -23,17 +24,17 @@ var clearUpArbol = function(data){
   var createFamilyForDown = function(r){
     var membersDown = [];
     var id = familyLink.length + 1;
-    membersDown.push(r.name);
+    membersDown.push(r.relationBase.id);
     return {children:[], parent:[],"type":'family',"id":'f'+id,"name":'', "image":"","direction":'down', 
-            'createdFor': r.name, members: {down:membersDown,up:[],same:[]}};
+            'createdFor': r.relationBase.id, members: {down:membersDown,up:[],same:[]}};
   };
 
 var createFamilyForSame = function(r){
     var membersUp = [];
     var id = familyLink.length + 1;
-    membersUp.push(r.name);    
+    membersUp.push(r.relationBase.id);    
     return {children:[], parent:[],"type":'family',"id":'f'+id,"name":'', "image":"","direction":'same', 
-            'createdFor': r.name, members: {down:[],up:membersUp,same:membersUp}};
+            'createdFor': r.relationBase.id, members: {down:[],up:membersUp,same:membersUp}};
   };
 
   var getFamilyfor = function(n,d){
@@ -54,7 +55,9 @@ var createFamilyForSame = function(r){
 
       //Si lo encuentro, quier decir que hay relacion.
       members.map(function(member){
-        if (member == n) family = l
+        if (member == n) {
+          family = l
+        }
         // family = l
       });
 
@@ -75,7 +78,7 @@ var createFamilyForSame = function(r){
   var getMember = function(r){
     var m;
     for (var i = 0; i < familyMembers.length; i++) {
-      if (familyMembers[i].name == r){
+      if (familyMembers[i].relationBase.id == r){
         m = familyMembers[i];
         if (!m.children) { m.children = [];}
         if (!m.parent) { m.parent = [];}
@@ -107,12 +110,12 @@ var createFamilyForSame = function(r){
       else {
         //tiene relacion con una persona :-o;
         // Quien es la persona?
-        var memberLinked = getMember(r.relationBase.source);
+        var memberLinked = getMember(r.relationBase.sourceId);
         //la persona que pusimos es hijo
         if (r.relationBase.relationType =='padre'){
           //down
           //hay una relacion donde la persoan que linkeo sea hijo de ?
-          var f = getFamilyfor(r.relationBase.source,'down');
+          var f = getFamilyfor(r.relationBase.sourceId,'down');
           var elHijo = memberLinked;
           var  elPadre=  r;
           //Si no hay la creo
@@ -121,8 +124,8 @@ var createFamilyForSame = function(r){
             var newFamiliy = createFamilyForDown(elHijo);
             familyMembers.push(newFamiliy);
             familyLink.push(newFamiliy);
-            newFamiliy.members.up.push(elPadre.name);
-            newFamiliy.members.same.push(elPadre.name);
+            newFamiliy.members.up.push(elPadre.relationBase.id);
+            newFamiliy.members.same.push(elPadre.relationBase.id);
             
 
             elPadre.children.push(newFamiliy);
@@ -141,8 +144,8 @@ var createFamilyForSame = function(r){
 
           }
           else {
-            f.members.up.push(r.name);
-            f.members.same.push(r.name);
+            f.members.up.push(r.relationBase.id);
+            f.members.same.push(r.relationBase.id);
             r.children.push(f);
             f.parent.push(r);
             var z = relations.length +1;
@@ -156,7 +159,7 @@ var createFamilyForSame = function(r){
         else if (r.relationBase.relationType =='pareja'){
           
           //hay una relacion donde la persoan que linkeo sea hijo de ?
-          var f = getFamilyfor(r.relationBase.source,'same');
+          var f = getFamilyfor(r.relationBase.sourceId,'same');
           var laPareja = memberLinked;
           var laEmparejada=  r;
           //Si no hay la creo
@@ -166,8 +169,8 @@ var createFamilyForSame = function(r){
             familyMembers.push(newFamiliy);
             familyLink.push(newFamiliy);
             
-            newFamiliy.members.up.push(laPareja.name);
-            newFamiliy.members.same.push(laPareja.name);
+            newFamiliy.members.up.push(laPareja.relationBase.id);
+            newFamiliy.members.same.push(laPareja.relationBase.id);
             
             laPareja.children.push(newFamiliy);
             newFamiliy.parent.push(laPareja);
@@ -189,8 +192,8 @@ var createFamilyForSame = function(r){
           }
           else {
             
-            f.members.up.push(r.name);
-            f.members.same.push(r.name);
+            f.members.up.push(r.relationBase.id);
+            f.members.same.push(r.relationBase.id);
             r.children.push(f);
             f.parent.push(r);
             var z = relations.length +1;
@@ -203,7 +206,7 @@ var createFamilyForSame = function(r){
         else if (r.relationBase.relationType =='hijo'){
           //down
           //hay una relacion donde la persoan que linkeo sea hijo de ?
-          var f = getFamilyfor(r.relationBase.source,'up');
+          var f = getFamilyfor(r.relationBase.sourceId,'up');
           var elHijo = r;
           var  elPadre=  memberLinked;
           //Si no hay la creo
@@ -212,7 +215,7 @@ var createFamilyForSame = function(r){
             var newFamiliy = createFamilyForDown(elHijo);
             familyMembers.push(newFamiliy);
             familyLink.push(newFamiliy);
-            newFamiliy.members.down.push(elPadre.name);
+            newFamiliy.members.down.push(elPadre.relationBase.id);
             
             var z = relations.length +1;
             
@@ -225,7 +228,7 @@ var createFamilyForSame = function(r){
 
           }
           else {
-            f.members.down.push(r.name);
+            f.members.down.push(r.relationBase.id);
             r.parent.push(f);
             f.children.push(r);
 
@@ -241,7 +244,7 @@ var createFamilyForSame = function(r){
         else if (r.relationBase.relationType =='hermano'){
           //down
           //hay una relacion donde la persoan que linkeo sea hijo de ?
-          var f = getFamilyfor(r.relationBase.source,'down');
+          var f = getFamilyfor(r.relationBase.sourceId,'down');
           var elHijo = r;
           var  elPadre=  memberLinked;
           //Si no hay la creo
@@ -250,7 +253,7 @@ var createFamilyForSame = function(r){
             var newFamiliy = createFamilyForDown(elHijo);
             familyMembers.push(newFamiliy);
             familyLink.push(newFamiliy);
-            newFamiliy.members.down.push(elPadre.name);
+            newFamiliy.members.down.push(elPadre.relationBase.id);
             
             var z = relations.length +1;
             
@@ -263,7 +266,7 @@ var createFamilyForSame = function(r){
 
           }
           else {
-            f.members.down.push(r.name);
+            f.members.down.push(r.relationBase.id);
             r.parent.push(f);
             f.children.push(r);
             var z = relations.length +1;
