@@ -12,7 +12,7 @@ var clearUpArbol = function(data){
     "type":'person',"id":'p'+i,
     "name":f.name,
     "profession": "housewife",
-    "sex":'f',
+    "sex":'m',
     "image": "perfil.c2dcec1f.svg",
     "relationBase": f};  
   });

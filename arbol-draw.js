@@ -11,6 +11,9 @@ var myChart = familyChart().nodes(nodes)
 var width = window.innerWidth, // default width
    height = window.innerHeight;
 
+var draw_size = 0.75;
+var height_draw = 100*draw_size;
+var width_draw = 80*draw_size;
 //drawing the svg and calling the familyChart opject.
 
 var svg = d3.select('#forces').append("svg")
@@ -110,15 +113,21 @@ function familyChart() {
     var defs = node.append("defs");
 
 
-    defs.append('pattern')
+    var allDeftRect= defs.append('pattern')
         .attr("id", function(d,i){return "my_image" + i})
         .attr("width", 1)
-        .attr("height", 1)
-        .append("svg:image")
+        .attr("height", 1);
+
+    allDeftRect.append('rect')
+        .attr("fill","white")
+        .attr("height", height_draw)
+        .attr("width", width_draw);
+
+    allDeftRect.append("svg:image")
         .attr("xlink:href", function(d) {return d.image})
-        .attr("height", "80")
-        .attr("width", "80")
-        .attr("x", 0)
+        .attr("height", height_draw)
+        .attr("width", width_draw)
+        .attr("x", 2)
         .attr("y", 0);
 
         //append deceased arc - only visible if "dead" is defined
@@ -132,12 +141,26 @@ function familyChart() {
             .attr('d',describeArc(0, -2.5, 12.5, -90, 90))
 
     //append circles
-    var circles = node.append("circle")
+
+    var dots = node.filter(function(d) { return d.type == "family"; }).append("circle")
                       .attr("class","circle")
-                      .attr("r", function(d){ //radius - bigger if family
+                      .attr("r",family_radius)
+                       .attr("fill",function(d,i){ //white if family, otherwise image
+                         if(d.type == "family"){return "#4570B6"}
+                         else{return "url(#my_image" + i + ")"}})
+                        .attr("stroke", "#4570B6")
+                          .attr("stroke-width","4px");
+
+    var circles = node.filter(function(d) { return d.type != "family"; }).append("rect")
+                      .attr("class","circle")
+                      .attr("width", function(d){ //radius - bigger if family
                           if (d.type == "family"){
                             return family_radius;
-                          } else{return 40;}})
+                          } else{return width_draw;}})
+                      .attr("height", function(d){ //radius - bigger if family
+                          if (d.type == "family"){
+                            return family_radius;
+                          } else{return height_draw;}})
                        .attr("fill",function(d,i){ //white if family, otherwise image
                          if(d.type == "family"){return "#4570B6"}
                          else{return "url(#my_image" + i + ")"}})
@@ -150,10 +173,10 @@ function familyChart() {
                           .on("mouseover", function(d){
                             if(d.type !== "family"){
                               //sets tooltip.  t_text = content in html
-                              t_text = "<strong>" + titleCase(d.name) + "</strong><br>Age: " + d.age
+                              t_text = "<strong>" + titleCase(d.name) + "</strong><br>" + d.relationBase.relationType
                               if(d.profession !== undefined){
                                 //only add profession if it is defined
-                                t_text += "<br>Profession: " + d.profession}
+                                t_text += "<br>de " + d.relationBase.source}
                               tooltip.html(t_text)
                               return tooltip.style("visibility", "visible");
                             }  })
@@ -173,8 +196,8 @@ function familyChart() {
     //append labels
     var texts = node.append("text")
         .style("fill", "black")
-        .attr("dx", 0)
-        .attr("dy", 50)
+        .attr("dx", 32)
+        .attr("dy", 92)
         .attr("text-anchor","middle")
         .text(function(d) {
             return titleCase(d.name);
