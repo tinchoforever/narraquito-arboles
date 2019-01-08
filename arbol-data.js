@@ -1,48 +1,23 @@
 //estas variables globales sirven para conectar con arbol-draw
-var nodes, edges, familyMembers;
-
-var loaddData = function(data){
-
-
-  //creo los nodos de todos 
-  familyMembers = [];
-  data.map(function(f,i){
-
-    toDataURL('perfil.c2dcec1f.png', function(dataUrl) {
-         familyMembers.push({
-              "mainId": f.id,  
-              "type":'person',"id":'p'+i,
-              "name":f.name,
-              "profession": "housewife",
-              "sex":'m',
-              "image":dataUrl,
-              "relationBase": f
-            });  
-        })
-  });
-  
-  function toDataURL(url, callback) {
-    var xhr = new XMLHttpRequest();
-    xhr.onload = function() {
-      var reader = new FileReader();
-      reader.onloadend = function() {
-        callback(reader.result);
-      }
-      reader.readAsDataURL(xhr.response);
-    };
-    xhr.open('GET', url);
-    xhr.responseType = 'blob';
-    xhr.send();
-  }
-
-};
+var nodes, edges;
 
 //limpia los datos y luego llama a arbol-draw
 var clearUpArbol = function(data){
   
 
-  
 
+  //creo los nodos de todos 
+  var familyMembers = data.map(function(f,i){
+    return {
+    "mainId": f.id,  
+    "type":'person',"id":'p'+i,
+    "name":f.name,
+    "profession": "housewife",
+    "sex":'m',
+    "image": "perfil.c2dcec1f.svg",
+    "relationBase": f};  
+  });
+  
 
   var familyLink = [];
 
@@ -362,7 +337,7 @@ var createFamilyForSame = function(r){
 
 
 //ejemplo de input de dataset, el callback deberia ser cualquier fuente de datos
-d3.csv('family.csv',loaddData);
+d3.csv('family.csv',clearUpArbol);
 
 // $http.get('/user/tree/' + id).then(function(req){
 //   clearUpArbol(req.data);
