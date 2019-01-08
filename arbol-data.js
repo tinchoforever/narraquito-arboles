@@ -331,8 +331,14 @@ var createFamilyForSame = function(r){
 
 
 }
+
+
 //ejemplo de input de dataset, el callback deberia ser cualquier fuente de datos
 d3.csv('family.csv',clearUpArbol);
+
+// $http.get('/user/tree/' + id).then(function(req){
+//   clearUpArbol(req.data);
+// })
 
 
 
