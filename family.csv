@@ -13,3 +13,10 @@ id,name,relationType,source,sourceId
 12,Mario Jose,padre,Hilda,8
 13,Caro,hermano,Martin,1
 14,Chucky,pareja,Caro,13
+15,Claudia,pareja,Osvaldo,7
+16,Franco,hijo,Osvaldo,7
+17,Pablo,hijo,Osvaldo,7
+18,Mirta,pareja,Gustavo,9
+19,Manque,hermano,Anahi,4
+20,Nahuel,hermano,Anahi,4
+21,Mimi,pareja,Nahuel,20
