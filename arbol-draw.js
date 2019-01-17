@@ -10,7 +10,7 @@ var myChart = familyChart().nodes(nodes)
 var width = window.innerWidth, // default width
    height = window.innerHeight;
 
-var draw_size = 0.75;
+var draw_size = 0.70;
 var height_draw = 100*draw_size;
 var width_draw = 80*draw_size;
 //drawing the svg and calling the familyChart opject.
@@ -24,7 +24,7 @@ var svg = d3.select('#forces').append("svg")
 
 
 function familyChart() {
-  
+
 
 var getFamiliyIdColor = function(fid){
   var id = parseInt(fid.replace('f',''));
@@ -76,9 +76,9 @@ var getFamiliyIdColor = function(fid){
         .attr("stroke-width",function(d){
           //stroke width - thicker if married/divorced
             if(d.type == 'married' || d.type =='divorced'){
-              return "4px"
+              return "5px"
             } else{
-              return "0.5px"
+              return "1px"
             }})
         .attr("stroke-dasharray", function(d){ //dashed if divorced
           if(d.type == 'divorced'){
