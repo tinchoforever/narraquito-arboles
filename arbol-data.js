@@ -1,6 +1,42 @@
 //estas variables globales sirven para conectar con arbol-draw
 var nodes, edges;
 
+var preloadfotos = function(data){
+  
+  //Tomamos las fotos para hacerlas unicas en dataurl y que se puedan exportar.
+  var q =  d3.queue();
+
+  function toDataURL(url, cb) {
+    var xhr = new XMLHttpRequest();
+    xhr.onload = function() {
+      var reader = new FileReader();
+      reader.onloadend = function() {
+        cb(null, reader.result);
+      }
+      reader.readAsDataURL(xhr.response);
+    };
+    xhr.open('GET', url);
+    xhr.responseType = 'blob';
+    xhr.send();
+  }
+
+  data.map(function(f,i){
+    q.defer(toDataURL,f.image  )
+  });
+  q.awaitAll(function(e,r){ 
+
+        data.map(function(f,i){
+
+           f.image = r[i];
+        });
+        clearUpArbol(data);
+
+      });
+
+}
+
+
+
 //limpia los datos y luego llama a arbol-draw
 var clearUpArbol = function(data){
   
@@ -14,7 +50,7 @@ var clearUpArbol = function(data){
     "name":f.name,
     "profession": "housewife",
     "sex":'m',
-    "image": "perfil.c2dcec1f.svg",
+    "image":f.image,
     "relationBase": f};  
   });
   
@@ -337,7 +373,7 @@ var createFamilyForSame = function(r){
 
 
 //ejemplo de input de dataset, el callback deberia ser cualquier fuente de datos
-d3.csv('family.csv',clearUpArbol);
+d3.csv('family.csv',preloadfotos);
 
 // $http.get('/user/tree/' + id).then(function(req){
 //   clearUpArbol(req.data);
