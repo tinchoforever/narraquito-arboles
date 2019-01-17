@@ -1,5 +1,6 @@
 var initTree = function(){
 
+var colorScale = d3.scaleOrdinal().range(["#e76056","#f3a32d","#fcda59","#2ebc98","#99c25f","#19c3e3","#0389d1","#3e4f5e","#9d6db6","#f562a2" ]);
 
 //defining the chart
 var myChart = familyChart().nodes(nodes)
@@ -142,11 +143,11 @@ function familyChart() {
 
     //append circles
 
-    var dots = node.filter(function(d) { return d.type == "family"; }).append("circle")
+    var dots = node.filter(function(d,i) { return d.type == "family"; }).append("circle")
                       .attr("class","circle")
                       .attr("r",family_radius)
                        .attr("fill",function(d,i){ //white if family, otherwise image
-                         if(d.type == "family"){return "#4570B6"}
+                         if(d.type == "family"){return colorScale(i);}
                          else{return "url(#my_image" + i + ")"}})
                         .attr("stroke", "#4570B6")
                           .attr("stroke-width","4px");
