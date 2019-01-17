@@ -22,9 +22,14 @@ var svg = d3.select('#forces').append("svg")
             // .attr("xmlns:xlink", "http://www.w3.org/1999/xlink")
             .call(myChart);
 
+
 function familyChart() {
+  
 
-
+var getFamiliyIdColor = function(fid){
+  var id = parseInt(fid.replace('f',''));
+        return colorScale(id);
+}
   var nodes = [],
       links = [] // default height
 
@@ -83,14 +88,15 @@ function familyChart() {
           }
         })
       .attr("stroke", function(d){  //grey unless adopted (blue) or married/divorced (gold) or married_invisible (white)
+        var color = getFamiliyIdColor(d.source);
         if(d.type == 'married' || d.type=="divorced"){
-          return "#2DB674"
+          return color;
         } else if(d.type=='adopted'){
-          return "#2DB674"
+          return color;
         } else if(d.type=='married_invisible'){
-          return "#2DB674"
+          return color;
         } else {
-          return "#2DB674"
+          return color;
         }
       });
 
@@ -147,9 +153,11 @@ function familyChart() {
                       .attr("class","circle")
                       .attr("r",family_radius)
                        .attr("fill",function(d,i){ //white if family, otherwise image
-                         if(d.type == "family"){return colorScale(i);}
+                         if(d.type == "family"){return getFamiliyIdColor(d.id);}
                          else{return "url(#my_image" + i + ")"}})
-                        .attr("stroke", "#4570B6")
+                        .attr("stroke",function(d,i){ //white if family, otherwise image
+                         if(d.type == "family"){return getFamiliyIdColor(d.id);}
+                         else{return "#4570B6"}})
                           .attr("stroke-width","4px");
 
     var circles = node.filter(function(d) { return d.type != "family"; }).append("rect")
@@ -222,13 +230,13 @@ function familyChart() {
         node.attr("transform", function(d){ return "translate(" + d.x + "," + d.y + ")"})
     });
 
-      // Set-up the export button
+    // Set-up the export button
     d3.select('#saveButton').on('click', function(){
       var svgString = getSVGString(svg.node());
       svgString2Image( svgString, 2*width, 2*height, 'png', save ); // passes Blob and filesize String to the callback
 
       function save( dataBlob, filesize ){
-        saveAs( dataBlob, 'D3 vis exported to PNG.png' ); // FileSaver.js function
+        saveAs( dataBlob, 'Arbol de Narraquito.png' ); // FileSaver.js function
       }
     });
 
