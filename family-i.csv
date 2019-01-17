@@ -1,0 +1,15 @@
+id,name,relationType,source
+1,Martin,base,
+2,Carlos,padre,Martin
+3,Monica,pareja,Carlos
+4,Anahi,pareja,Martin
+5,Cristian,hijo,Carlos
+6,Onelio,padre,Carlos
+7,Osvaldo,hijo,Onelio
+8,Hilda,pareja,Onelio
+9,Gustavo,hermano,Carlos
+10,Carlitos,hermano,Monica
+11,Mario,padre,Anahi
+12,Mario Jose,padre,Hilda
+13,Chucky,pareja,Caro
+14,Caro,hermano,Martin
